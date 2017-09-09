@@ -50,8 +50,7 @@ def check_and_send():
                     emoji='📄' if result['type'] == 'notice' else '📑',
                     title=document['title'],
                     content='\n' + document['content'] if document['content'] else '',
-                    attachements=''.join(
-                        '\n📎 <b>Allegati</b>' +
+                    attachements=('\n📎 <b>Allegati</b>' if document['attachements'] else '') + ''.join(
                         "\n➖ <a href=\"{url}\">{name}</a>".format(url=x['url'], name=x['name'])
                         for x in document['attachements']
                     ) if document['attachements'] else ''
@@ -62,6 +61,7 @@ def check_and_send():
 
             c.execute('INSERT OR IGNORE INTO urls VALUES(?);', (result['url'],))
             conn.commit()
+
 
 if __name__ == "__main__":
     check_and_send()
