@@ -22,4 +22,4 @@ TOKEN = ""
 
 CHAT_IDS = []
 
-BASE_URL = "http://www.isarchimede.gov.it"
+BASE_URL = "http://www.isarchimede.edu.it/area-utenti/gestione-delle-circolari"

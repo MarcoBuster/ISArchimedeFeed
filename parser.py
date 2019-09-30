@@ -24,35 +24,15 @@ from bs4 import BeautifulSoup
 import config
 
 
-def get_notices():
+def get_circulars():
     r = requests.get(config.BASE_URL)
     soup = BeautifulSoup(r.text, "html.parser")
-    results = soup.find_all('li', {"class": "widget widget_pasw2015_posts"})[0].find_all('li')
-    notices = []
-    for notice in results:
-        notices.append({
-                "title": notice.find('a').text.lstrip(),
-                "date": notice.find('span', {'class': 'hdate'}).text.lstrip(),
-                "url": notice.find('a').get('href'),
-                "type": "notice",
-             })
-
-    return notices
-
-
-def get_circulars():
-    r = requests.get("http://www.isarchimede.gov.it")
-    soup = BeautifulSoup(r.text, "html.parser")
-    results = soup.find_all('li', {"class": "widget widget_pasw2015_circolari"})[0].find_all('li')
+    results = soup.find('div', {"class": "postentry"}).find('div').find_all('div')
     circulars = []
-    for circular in results:
-        circulars.append({
-                "title": circular.find('a').text.lstrip(),
-                "date": circular.find('span', {'class': 'hdate'}).text.lstrip(),
-                "url": circular.find('a').get('href'),
-                "type": "circular",
-            })
-
+    for result in results:
+        if result.find('a'):
+            circulars.append(result.find('a').get('href'))
+    
     return circulars
 
 
@@ -81,6 +61,3 @@ def get_more_info(url):
         'attachements': attachments
     }
 
-
-def get_all():
-    return get_notices() + get_circulars()

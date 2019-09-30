@@ -33,12 +33,12 @@ c.execute('CREATE TABLE IF NOT EXISTS urls(url TEXT);')
 
 
 def check_and_send():
-    results = parser.get_all()
-    for result in results:
-        c.execute('SELECT EXISTS(SELECT 1 FROM urls WHERE url=? LIMIT 1);', (result['url'],))
+    results = parser.get_circulars()
+    for result in reversed(results):
+        c.execute('SELECT EXISTS(SELECT 1 FROM urls WHERE url=? LIMIT 1);', (result,))
         exists = c.fetchone()[0]
         if not exists:
-            document = parser.get_more_info(result['url'])
+            document = parser.get_more_info(result)
             if not document:
                 continue
 
@@ -47,7 +47,7 @@ def check_and_send():
                 "{content}"
                 "\n{attachements}"
                 .format(
-                    emoji='📄' if result['type'] == 'notice' else '📑',
+                    emoji='📑',
                     title=document['title'],
                     content='\n' + document['content'] if document['content'] else '',
                     attachements=('\n📎 <b>Allegati</b>' if document['attachements'] else '') + ''.join(
@@ -59,7 +59,7 @@ def check_and_send():
             for chat_id in config.CHAT_IDS:
                 bot.chat(chat_id).send(text, syntax="HTML")
 
-            c.execute('INSERT OR IGNORE INTO urls VALUES(?);', (result['url'],))
+            c.execute('INSERT OR IGNORE INTO urls VALUES(?);', (result,))
             conn.commit()
 
 
